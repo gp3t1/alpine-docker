@@ -1,0 +1,44 @@
+#!/bin/ash
+
+# USER/GROUP NAME REGEXP
+NAME_REGX="^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$"
+# DEFAULT UID:GUID
+UID=500
+GUID=501
+
+## CHECK ARGS
+if [[ $# -lt 1 ]] && [[ $# -gt 2 ]]; then
+	printf "usage: setAppUser <username>:<group> [<uid>:<guid>]"
+	exit 1
+fi
+
+## EXTRACT USER & GROUP
+if ! echo "$1" | egrep -r "^$NAME_REGX:$NAME_REGX$"; then
+	printf "\nCannot extract username and groupname from %s" "$1"
+	exit 2
+fi
+USER=$(echo $1 | awk -F':' '{ print $1 }')
+GROUP=$(echo $1 | awk -F':' '{ print $2 }')
+
+## EXTRACT UID & GUID
+if ! echo "$2" | egrep -r "^$NAME_REGX:$NAME_REGX$"; then
+	UID=$(echo $2 | awk -F':' '{ print $1 }')
+	GUID=$(echo $2 | awk -F':' '{ print $2 }')
+fi
+
+## CREATE GROUP
+if id -g "$GROUP" || id -g "$GUID"; then
+	printf "\nGroup %s(%s) already exists!" "$UID" "$USER"
+	exit 3
+else
+	addgroup -g "${GUID}" -S "${GROUP}" || exit 4
+fi
+
+## CREATE USER
+if id "$USER" || id "$UID" ; then
+	printf "\nUser %s(%s) already exists!" "$UID" "$USER"
+	exit 5
+else
+	adduser  -u "${UID}" -S -D -s /bin/ash -G "${GROUP}" -h "/var/run/${USER}" "${USER}" || exit 6
+fi
+
