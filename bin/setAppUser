@@ -1,44 +1,30 @@
-#!/bin/ash
+#!/bin/sh
 
-# USER/GROUP NAME REGEXP
-NAME_REGX="^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$"
-# DEFAULT UID:GUID
-UID=500
-GUID=501
-
-## CHECK ARGS
-if [[ $# -lt 1 ]] && [[ $# -gt 2 ]]; then
-	printf "usage: setAppUser <username>:<group> [<uid>:<guid>]"
-	exit 1
-fi
-
-## EXTRACT USER & GROUP
-if ! echo "$1" | egrep -r "^$NAME_REGX:$NAME_REGX$"; then
-	printf "\nCannot extract username and groupname from %s" "$1"
-	exit 2
-fi
-USER=$(echo $1 | awk -F':' '{ print $1 }')
-GROUP=$(echo $1 | awk -F':' '{ print $2 }')
-
-## EXTRACT UID & GUID
-if ! echo "$2" | egrep -r "^$NAME_REGX:$NAME_REGX$"; then
-	UID=$(echo $2 | awk -F':' '{ print $1 }')
-	GUID=$(echo $2 | awk -F':' '{ print $2 }')
-fi
+## CHECK ENV VAR
+[ -n "$APP_USER" 	] || ( echo "[ENV] APP_USER is empty"; 	exit 1 )
+[ -n "$APP_UID" 	] || ( echo "[ENV] APP_UID is empty"; 	exit 1 )
+[ -n "$APP_GROUP" ] || ( echo "[ENV] APP_GROUP is empty"; exit 1 )
+[ -n "$APP_GUID" 	] || ( echo "[ENV] APP_GUID is empty"; 	exit 1 )
 
 ## CREATE GROUP
-if id -g "$GROUP" || id -g "$GUID"; then
-	printf "\nGroup %s(%s) already exists!" "$UID" "$USER"
-	exit 3
+if id -g "$APP_GROUP" ;then
+	printf "\nGroup %s already exists!" "$APP_GROUP"
+	exit 2
+elif id -g "$APP_GUID"; then
+	printf "\nGroup %s already exists!" "$APP_GUID"
+	exit 2
 else
-	addgroup -g "${GUID}" -S "${GROUP}" || exit 4
+	addgroup -g "${APP_GUID}" -S "${APP_GROUP}" || exit 3
 fi
 
 ## CREATE USER
-if id "$USER" || id "$UID" ; then
-	printf "\nUser %s(%s) already exists!" "$UID" "$USER"
-	exit 5
+if id "$APP_USER" ; then
+	printf "\nUser %s already exists!" "$APP_USER"
+	exit 4
+elif id "$APP_UID" ; then
+	printf "\nUser %s already exists!" "$APP_UID"
+	exit 4
 else
-	adduser  -u "${UID}" -S -D -s /bin/ash -G "${GROUP}" -h "/var/run/${USER}" "${USER}" || exit 6
+	adduser  -u "${APP_UID}" -S -D -s /bin/ash -G "${APP_GROUP}" -h "/var/run/${APP_USER}" "${APP_USER}" || exit 5
 fi
 

@@ -1,14 +1,14 @@
-#!/bin/ash
+#!/bin/sh
 
 checkUser() {
-	if [[ $(whoami) != "root" ]]; then
+	if [ "$(whoami)" != "root" ]; then
 		printf "\n\'launch\' must be run as root!"
 		return 1
 	fi
 }
 
-if checkUser && [[ -z "$APP_USER" ]]; then
-		exec tini $@
+if checkUser && [ -z "$APP_USER" ]; then
+		exec tini "$@"
 	else
-		exec su-exec "$APP_USER":"$APP_GROUP" tini -- $@
+		exec su-exec "$APP_USER:$APP_GROUP" tini -- "$@"
 fi
