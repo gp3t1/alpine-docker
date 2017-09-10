@@ -1,7 +1,7 @@
 ## ALPINE BUILD SETTINGS
-ARG VERSION="3.6"
+ARG ALPINE_TAG="3.6"
 
-FROM alpine:${VERSION}
+FROM alpine:${ALPINE_TAG}
 
 LABEL maintainer="Jeremy PETIT <jeremy.petit@gmail.com>" \
 			description="alpine with su-exec and tini"

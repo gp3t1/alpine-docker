@@ -1,0 +1,36 @@
+#!/bin/bash
+# set  -x
+
+IMAGES2PUSH=""
+ALPINE_TAGS=$(wget -q https://registry.hub.docker.com/v1/repositories/alpine/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | sort -u | tail -5)
+
+printf "\n##########################"
+printf "\n##  Start Custom Build  ##"
+printf "\n##########################"
+
+if [[ "$SOURCE_BRANCH" =~ ^[0-9.]+$ ]]; then
+	printf "\n[RELEASE] Build for Repo: %s" 	"$DOCKER_REPO"
+else
+	printf "\n[TEST] Build for Repo: %s" 	"$DOCKER_REPO"
+fi
+printf "\n-- SOURCE_BRANCH	: %s" 				"$SOURCE_BRANCH"
+printf "\n-- SOURCE_COMMIT	: %s (%s)" 		"$SOURCE_COMMIT" 	"$COMMIT_MSG"
+printf "\n-- REPO_NAME 			: %s" 				"$REPO_NAME"
+printf "\n-- IMAGE_NAME 		: %s (%s)" 		"$IMAGE_NAME" 		"$CACHE_TAG"
+printf "\n--------------------------------\n"
+
+
+buildAlpine(){
+	ALPINE_TAG="$1"
+	NAME="$REPO_NAME:$SOURCE_BRANCH-alpine_$ALPINE_TAG"
+
+	printf "\n\n## Building %s ##\n" "$NAME"
+	docker build --build-arg ALPINE_TAG="$ALPINE_TAG" -t "$NAME" . \
+		&& IMAGES2PUSH="$NAME $IMAGES2PUSH" \
+		|| (printf "\nCannot build %s" "$NAME"; exit 1)
+}
+
+for t in "${ALPINE_TAGS[@]}"; do
+	buildAlpine "$t"
+done
+echo "$IMAGES2PUSH" > hooks/names
