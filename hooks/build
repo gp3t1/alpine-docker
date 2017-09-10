@@ -1,6 +1,13 @@
 #!/bin/bash
 # set  -x
 
+locate wget
+locate curl
+ls -la /usr/bin/
+docker run --rm mwendler/wget --no-check-certificate -q https://registry.hub.docker.com/v1/repositories/alpine/tags -O -
+exit 1
+
+
 IMAGES2PUSH=""
 ALPINE_TAGS=$(wget -q https://registry.hub.docker.com/v1/repositories/alpine/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | sort -u | tail -5)
 
