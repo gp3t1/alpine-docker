@@ -2,7 +2,7 @@
 # set  -x
 
 echo "" > hooks/names
-ALPINE_TAGS=$(curl https://registry.hub.docker.com/v1/repositories/alpine/tags | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | sort -u | tail -5)
+ALPINE_TAGS=($(curl https://registry.hub.docker.com/v1/repositories/alpine/tags | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | sort -u | tail -5))
 
 printf "\n##########################"
 printf "\n##  Start Custom Build  ##"
@@ -30,7 +30,7 @@ buildAlpine(){
 		|| (printf "\nCannot build %s" "$NAME"; exit 1)
 }
 
-for t in ${ALPINE_TAGS[@]}; do
+for t in "${ALPINE_TAGS[@]}"; do
 	buildAlpine "$t"
 done
 
