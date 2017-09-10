@@ -30,7 +30,7 @@ buildAlpine(){
 		|| (printf "\nCannot build %s" "$NAME"; exit 1)
 }
 
-for t in "${ALPINE_TAGS[@]}"; do
+for t in ${ALPINE_TAGS[@]}; do
 	buildAlpine "$t"
 done
 echo "$IMAGES2PUSH" > hooks/names
