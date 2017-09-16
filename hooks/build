@@ -24,6 +24,7 @@ printf "\n--------------------------------\n"
 
 
 buildAlpine(){
+	build_start=$(date +%s)
 	ALPINE_TAG="$1"
 	NAME="$REPO_NAME:$SOURCE_BRANCH-$ALPINE_TAG"
 
@@ -31,6 +32,7 @@ buildAlpine(){
 	docker build --build-arg ALPINE_TAG="$ALPINE_TAG" -t "$NAME" . \
 		&& echo "$NAME" >> hooks/names \
 		|| (printf "\nCannot build %s" "$NAME"; exit 1)
+	printf "\n## Build time for %s : %ss\n" "$NAME" "$(( $(date +%s) - build_start ))"
 }
 
 echo "" > hooks/names
