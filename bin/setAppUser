@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if [ "$1" = "-h" ]; then
+	printf "setAppUser usage:"
+	printf "\n*  setAppUser -h     -- print this help" >&2
+	printf "\n*  readSecret        -- create user & group as specified in APP_USER, APP_UID, APP_GROUP and APP_GUID" >&2
+	exit 0
+fi
+
+printf "** Try to create user %s(%s):%s(%s)" "$APP_UID" "$APP_USER" "$APP_GUID" "$APP_GROUP"
+
 ## CHECK ENV VAR
 [ -n "$APP_USER" 	] || ( echo "[ENV] APP_USER is empty"; 	exit 1 )
 [ -n "$APP_UID" 	] || ( echo "[ENV] APP_UID is empty"; 	exit 1 )
@@ -7,24 +16,34 @@
 [ -n "$APP_GUID" 	] || ( echo "[ENV] APP_GUID is empty"; 	exit 1 )
 
 ## CREATE GROUP
-if id -g "$APP_GROUP" ;then
+if id -g "$APP_GROUP" 2>/dev/null ;then
 	printf "\nGroup %s already exists!" "$APP_GROUP"
 	exit 2
-elif id -g "$APP_GUID"; then
+elif id -g "$APP_GUID" 2>/dev/null ; then
 	printf "\nGroup %s already exists!" "$APP_GUID"
 	exit 2
 else
-	addgroup -g "${APP_GUID}" -S "${APP_GROUP}" || exit 3
+	if addgroup -g "${APP_GUID}" -S "${APP_GROUP}"; then
+		printf "\n*  Group %s(%s) added" "$APP_GUID" "$APP_GROUP"
+	else
+		printf "\n*  Group creation failed for %s(%s)" "$APP_GUID" "$APP_GROUP"
+		exit 3
+	fi
 fi
 
 ## CREATE USER
-if id "$APP_USER" ; then
+if id "$APP_USER" 2>/dev/null ; then
 	printf "\nUser %s already exists!" "$APP_USER"
 	exit 4
-elif id "$APP_UID" ; then
+elif id "$APP_UID" 2>/dev/null ; then
 	printf "\nUser %s already exists!" "$APP_UID"
 	exit 4
 else
-	adduser  -u "${APP_UID}" -S -D -s /bin/ash -G "${APP_GROUP}" -h "/var/run/${APP_USER}" "${APP_USER}" || exit 5
+	if adduser  -u "${APP_UID}" -S -D -s /bin/ash -G "${APP_GROUP}" -h "/var/run/${APP_USER}" "${APP_USER}"; then
+		printf "\n*  User %s(%s) added" "$APP_UID" "$APP_USER"
+	else
+		printf "\n*  User creation failed for %s(%s)" "$APP_UID" "$APP_USER"
+		exit 5
+	fi
 fi
 

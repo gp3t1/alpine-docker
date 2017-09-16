@@ -1,14 +1,26 @@
 #!/bin/sh
 
-checkUser() {
-	if [ "$(whoami)" != "root" ]; then
-		printf "\n\'launch\' must be run as root!"
-		return 1
-	fi
-}
+if [ "$(whoami)" != "root" ]; then
+	printf "\n\'launch\' must be run as root!"
+	exit 1
+fi
 
-if checkUser && [ -z "$APP_USER" ]; then
-		exec tini "$@"
+if [ -n "$APP_USER" ] && [ -n "$APP_GROUP" ]; then
+		printf "<RUN AS APPLICATION USER>\n"
+		if ! id -u "$APP_USER" 2>/dev/null || ! id -g "$APP_GROUP" 2>/dev/null ; then
+			if [ "$ALP_DEBUG" -eq 1 ]; then
+				printf "\n[DEBUG] %s\n" "$(setAppUser)"
+			else
+				printf "\n -- Application user specified [%s(%s):%s(%s)] but not found" "$APP_UID" "$APP_USER" "$APP_GUID" "$APP_GROUP"
+				printf "\n -- You can use setAppUser to create it.\n** "
+				setAppUser -h
+				exit 1
+			fi
+		fi
+		set -x
+		exec su-exec "$APP_USER:$APP_GROUP" tini -s -- "$@"
 	else
-		exec su-exec "$APP_USER:$APP_GROUP" tini -- "$@"
+		printf "<RUN AS ROOT>\n"
+		set -x
+		exec tini -- "$@"
 fi
