@@ -25,7 +25,7 @@ printf "\n--------------------------------\n"
 
 buildAlpine(){
 	ALPINE_TAG="$1"
-	NAME="$REPO_NAME:$SOURCE_BRANCH-alpine_$ALPINE_TAG"
+	NAME="$REPO_NAME:$SOURCE_BRANCH-alp-$ALPINE_TAG"
 
 	printf "\n\n## Building %s ##\n" "$NAME"
 	docker build --build-arg ALPINE_TAG="$ALPINE_TAG" -t "$NAME" . \
