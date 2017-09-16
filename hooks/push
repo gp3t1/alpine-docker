@@ -10,13 +10,14 @@ if [[ ! -f hooks/names ]]; then
 	exit 0
 fi
 
+REF_ALPINE_TAG="$(grep -E "^ARG ALPINE_TAG=.*$" ./Dockerfile | awk -F'=' '{ print $2 }' )"
 while read line  
 do
 	if [ -n "$line" ]; then
 		printf "\nPushing %s...\n" "$line"
 		docker push "$line" || (printf "\nCannot push %s" "$line"; exit 1)
 		# If neww version with alpline:latest
-		if [[ "${SOURCE_BRANCH}" =~ ^[0-9.]+$ ]] && [[ "$line" =~ .*alpine_latest ]]; then
+		if [[ "${SOURCE_BRANCH}" =~ ^[0-9.]+$ ]] && [[ "$line" =~ .*-${REF_ALPINE_TAG} ]]; then
 			ALT_NAMES=(
 				"${REPO_NAME}:latest"
 				"${REPO_NAME}:${SOURCE_BRANCH}")
