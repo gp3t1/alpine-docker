@@ -10,7 +10,7 @@ if [[ ! -f hooks/names ]]; then
 	exit 0
 fi
 
-REF_ALPINE_TAG="$(grep -E "^ARG ALPINE_TAG=.*$" ./Dockerfile | awk -F'=' '{ print $2 }' )"
+REF_ALPINE_TAG="$(grep -E "^ARG ALPINE_TAG=.*$" ./Dockerfile | awk -F'=' '{ print $2 }' | tr -d '"' )"
 while read line  
 do
 	if [ -n "$line" ]; then
