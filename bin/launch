@@ -7,7 +7,7 @@ fi
 
 if [ -n "$APP_USER" ] && [ -n "$APP_GROUP" ]; then
 		printf "<RUN AS APPLICATION USER>\n"
-		if ! id -u "$APP_USER" 2>/dev/null || ! id -g "$APP_GROUP" 2>/dev/null ; then
+		if ! id -u "$APP_USER" 2>/dev/null 1>&2 || ! id -g "$APP_GROUP" 2>/dev/null 1>&2 ; then
 			if [ "$ALP_DEBUG" -eq 1 ]; then
 				printf "\n[DEBUG] %s\n" "$(setAppUser)"
 			else

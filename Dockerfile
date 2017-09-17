@@ -15,8 +15,9 @@ RUN apk --no-cache add 	su-exec \
 												tini
 
 COPY bin/* /usr/bin/
-RUN  chmod ugo+x	/usr/bin/launch \
-								 	/usr/bin/setAppUser \
+RUN  chmod ug+x	/usr/bin/launch \
+								/usr/bin/setAppUser \
+								/usr/bin/readSecret \
 	&& chmod o-w 	/usr/bin/*
 
 ENTRYPOINT ["/usr/bin/launch"]
