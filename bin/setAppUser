@@ -24,7 +24,7 @@ elif id -g "$APP_GUID" 2>/dev/null ; then
 	exit 2
 else
 	if addgroup -g "${APP_GUID}" -S "${APP_GROUP}"; then
-		printf "\n*  Group %s(%s) added\n" "$APP_GUID" "$APP_GROUP"
+		printf "\n*  Group %s(%s) added" "$APP_GUID" "$APP_GROUP"
 	else
 		printf "\n*  Group creation failed for %s(%s)\n" "$APP_GUID" "$APP_GROUP"
 		exit 3
