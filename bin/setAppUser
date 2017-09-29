@@ -17,32 +17,32 @@ printf "** Try to create user %s(%s):%s(%s)" "$APP_UID" "$APP_USER" "$APP_GUID" 
 
 ## CREATE GROUP
 if id -g "$APP_GROUP" 2>/dev/null ;then
-	printf "\nGroup %s already exists!" "$APP_GROUP"
+	printf "\nGroup %s already exists!\n" "$APP_GROUP"
 	exit 2
 elif id -g "$APP_GUID" 2>/dev/null ; then
-	printf "\nGroup %s already exists!" "$APP_GUID"
+	printf "\nGroup %s already exists!\n" "$APP_GUID"
 	exit 2
 else
 	if addgroup -g "${APP_GUID}" -S "${APP_GROUP}"; then
-		printf "\n*  Group %s(%s) added" "$APP_GUID" "$APP_GROUP"
+		printf "\n*  Group %s(%s) added\n" "$APP_GUID" "$APP_GROUP"
 	else
-		printf "\n*  Group creation failed for %s(%s)" "$APP_GUID" "$APP_GROUP"
+		printf "\n*  Group creation failed for %s(%s)\n" "$APP_GUID" "$APP_GROUP"
 		exit 3
 	fi
 fi
 
 ## CREATE USER
 if id "$APP_USER" 2>/dev/null ; then
-	printf "\nUser %s already exists!" "$APP_USER"
+	printf "\nUser %s already exists!\n" "$APP_USER"
 	exit 4
 elif id "$APP_UID" 2>/dev/null ; then
-	printf "\nUser %s already exists!" "$APP_UID"
+	printf "\nUser %s already exists!\n" "$APP_UID"
 	exit 4
 else
 	if adduser  -u "${APP_UID}" -S -D -s /bin/ash -G "${APP_GROUP}" -h "/var/run/${APP_USER}" "${APP_USER}"; then
-		printf "\n*  User %s(%s) added" "$APP_UID" "$APP_USER"
+		printf "\n*  User %s(%s) added\n" "$APP_UID" "$APP_USER"
 	else
-		printf "\n*  User creation failed for %s(%s)" "$APP_UID" "$APP_USER"
+		printf "\n*  User creation failed for %s(%s)\n" "$APP_UID" "$APP_USER"
 		exit 5
 	fi
 fi
